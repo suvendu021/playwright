@@ -3,6 +3,7 @@ import json
 import pytest
 from playwright.sync_api import Playwright, expect
 
+from pageObjects.login import Login
 from utils.api_helper import ApiHelper
 
 
@@ -22,25 +23,24 @@ def test_end2end_api_and_ui_testing(playwright:Playwright,credential_of_user):
     orderId = apiHelper_object.createOrder(playwright,credential_of_user)
     # print(orderId)
 
+    userName=credential_of_user["username"]
+    passWord=credential_of_user["password"]
+
 
     # login to website
-    page.goto("https://rahulshettyacademy.com/client")
-    page.get_by_placeholder("email@example.com").fill(credential_of_user["username"])
-    page.get_by_placeholder("enter your passsword").fill(credential_of_user["password"])
-    page.get_by_role("button",name="Login").click()
-    expect(page.get_by_role("button",name=" HOME ")).to_be_visible()
 
-    page.get_by_role("button",name="ORDERS").click()
+    login=Login(page)
+    login.navigate_to_website()
+    dashboard=login.login_to_website(userName,passWord)
 
-
-
-
+    # validate dashboard page
+    dashboard.validate_dashboard_page()
+    order=dashboard.navigate_to_order_page()
 
     # go to order history > match with order id click view button
-    order=page.locator("tr").filter(has_text=orderId)
-    order.get_by_role("button",name="View").click()
+    orderHistory=order.click_on_view_order(orderId)
 
-    expect(page.locator(".tagline")).to_contain_text("Thank you for Shopping With Us")
+    orderHistory.validate_order_history_page()
 
     context.close()
 
