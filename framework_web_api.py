@@ -1,7 +1,7 @@
 import json
 
 import pytest
-from playwright.sync_api import Playwright, expect
+from playwright.sync_api import Playwright
 
 from pageObjects.login import Login
 from utils.api_helper import ApiHelper
@@ -13,11 +13,10 @@ with open("data_for_framework/credentials.json") as f:
     credential_list=credentials_data["credentials"]
 
 
+@pytest.mark.smoke
 @pytest.mark.parametrize('credential_of_user',credential_list)
-def test_end2end_api_and_ui_testing(playwright:Playwright,credential_of_user):
-    browser=playwright.chromium.launch(headless=False)
-    context=browser.new_context()
-    page=context.new_page()
+def test_end2end_api_and_ui_testing(playwright:Playwright,credential_of_user,create_browser_object):
+
 
     apiHelper_object = ApiHelper()
     orderId = apiHelper_object.createOrder(playwright,credential_of_user)
@@ -29,7 +28,7 @@ def test_end2end_api_and_ui_testing(playwright:Playwright,credential_of_user):
 
     # login to website
 
-    login=Login(page)
+    login=Login(create_browser_object)
     login.navigate_to_website()
     dashboard=login.login_to_website(userName,passWord)
 
@@ -42,5 +41,4 @@ def test_end2end_api_and_ui_testing(playwright:Playwright,credential_of_user):
 
     orderHistory.validate_order_history_page()
 
-    context.close()
 
