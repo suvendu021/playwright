@@ -4,7 +4,7 @@ import pytest
 from playwright.sync_api import Playwright
 
 from pageObjects.login import Login
-from utils.api_helper import ApiHelper
+from utils.api_helper_framework import ApiHelper
 
 
 
